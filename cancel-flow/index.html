@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Shvasa Cancel Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#EDEBE4; --surface:#FFFFFF; --surface2:#F2F0EA; --fg:#1B2220; --muted:#5E6A65; --line:#DAD6CA;
+  --accent:#C8283C; --accent-ink:#FFFFFF; --teal:#0A7C6A; --violet:#5B3FD0; --violet-soft:#ECE7FF; --gold-soft:#FFF1CC; --ph:#8A5E00;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101514; --surface:#18201E; --surface2:#212B28; --fg:#EAF0EC; --muted:#9CABA4; --line:#2E3A36;
+  --accent:#FF6677; --accent-ink:#1A0A0D; --teal:#4FD1B8; --violet:#A894FF; --violet-soft:#2A2250; --gold-soft:#3A2F14; --ph:#F0B654; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101514; --surface:#18201E; --surface2:#212B28; --fg:#EAF0EC; --muted:#9CABA4; --line:#2E3A36;
+  --accent:#FF6677; --accent-ink:#1A0A0D; --teal:#4FD1B8; --violet:#A894FF; --violet-soft:#2A2250; --gold-soft:#3A2F14; --ph:#F0B654; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1360px;margin:0 auto;display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rail h1{font-size:19px;line-height:1.25;margin:0;text-wrap:balance}
+.rail p{margin:0;color:var(--muted);font-size:13px}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--teal);font-weight:600}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.rc h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface2);color:var(--fg);border-radius:8px;padding:6px 10px;font-size:12.5px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.steps li{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}
+.steps li i{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);font-style:normal;font-size:11px;display:grid;place-items:center;flex:none}
+.steps li.on{color:var(--fg);font-weight:600}
+.steps li.on i{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.note{font-size:13px}
+.log{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px;max-height:150px;overflow:auto}
+.log div{overflow-wrap:anywhere}
+ul.plain{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px}
+ul.plain li{margin:3px 0}
+.ph{color:var(--ph);border-bottom:1px dotted var(--ph);white-space:nowrap}
+.linkbtn{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:12.5px;padding:0;align-self:flex-start}
+.rc a{color:var(--teal)}
+.ptag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;border-radius:4px;padding:1px 6px;vertical-align:1px}
+.ptag.new{background:var(--violet-soft);color:var(--violet)}
+.ptag.live{background:#DDF3EE;color:#0A6B5B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ptag.live{background:#12332B;color:#6EE0C4}}
+:root[data-theme="dark"] .ptag.live{background:#12332B;color:#6EE0C4}
+.stage{display:flex;justify-content:center;min-width:0}
+
+/* ===== Shvasa platform mock (fixed light palette, copied from the web UI) ===== */
+.plat{--red:#FC4456;--red-d:#E33346;--teal:#00A08B;--teal2:#17A88B;--dark:#333;--pbg:#F0F0F5;--card:#fff;--mint:#E7F6F2;--cream:#FFF8E8;--gold:#F5B301;--mut:#9E9E9E;
+  font-family:Roboto,'Segoe UI',Arial,sans-serif;color:#333;font-size:15px;background:var(--pbg);width:100%;min-width:0}
+.plat *{box-sizing:border-box}
+.plat .ph{color:#9A6A00;border-bottom:1px dotted #9A6A00}
+.plat .btn{border:none;border-radius:7px;font-weight:600;font-size:14px;padding:11px 22px;transition:.15s;font-family:inherit;cursor:pointer}
+.plat .btn-red{background:var(--red);color:#fff}.plat .btn-red:hover{background:var(--red-d)}
+.plat .btn-out{background:#fff;color:var(--red);border:1px solid var(--red)}
+.plat .btn-teal{background:var(--teal2);color:#fff}
+.plat .btn-grey{background:#fff;color:#555;border:1px solid #ddd}
+.plat .btn.block{width:100%}
+.plat .link{color:var(--red);font-weight:600;font-size:13px;background:none;border:none;text-decoration:underline;padding:6px;cursor:pointer;font-family:inherit}
+.plat .link.grey{color:#777;font-weight:500}
+.plat .small{font-size:12px;color:var(--mut)}
+.plat .caps{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:#aaa;font-weight:700}
+.plat .card{background:var(--card);border-radius:9px;box-shadow:0 1px 4px rgba(20,20,43,.07);padding:16px}
+.plat h2.t{font-size:22px;margin:0 0 4px;line-height:1.25}
+.plat h3.t{font-size:16px;margin:0 0 6px}
+.plat p{margin:0}
+/* web chrome */
+.browser{width:100%;max-width:1020px;border-radius:12px;border:1px solid #cfcfd6;overflow:hidden;background:#fff;box-shadow:0 14px 40px rgba(0,0,0,.14)}
+.bchrome{height:34px;background:#e9e9ee;display:flex;align-items:center;gap:6px;padding:0 12px}
+.bchrome i{width:9px;height:9px;border-radius:50%;background:#c4c4cc}
+.bchrome span{flex:1;margin-left:8px;background:#fff;border-radius:6px;padding:3px 10px;font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.appnav{background:var(--dark);color:#fff;display:flex;align-items:center;gap:10px;padding:0 20px;height:56px}
+.appnav .logo{font-size:24px;font-weight:500;letter-spacing:.5px}
+.appnav .items{margin-left:auto;display:flex;align-items:center;gap:2px}
+.appnav .ni{font-size:12px;padding:8px 10px;border-bottom:3px solid transparent;color:#eee;white-space:nowrap}
+.appnav .ni.on{border-bottom-color:var(--teal2)}
+.appnav .bk{background:var(--red);color:#fff;border-radius:7px;padding:8px 16px;font-weight:600;font-size:13px;margin-left:8px}
+.appnav .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ff9a8b,#fc4456);display:grid;place-items:center;font-size:12px;font-weight:700;margin-left:10px}
+@media (max-width:1000px){.appnav .ni.hide{display:none}}
+.webbody{padding:18px 22px 26px;min-height:640px}
+.crumb{font-size:12px;color:#888;margin-bottom:12px}
+.crumb b{color:#333}
+/* app chrome */
+.phone{width:100%;max-width:392px;background:#111;border-radius:38px;padding:10px;box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.phone .plat{border-radius:29px;overflow:hidden;height:790px;max-height:calc(100vh - 50px);min-height:620px;display:flex;flex-direction:column;position:relative}
+.aphdr{background:var(--dark);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 14px}
+.aphdr .logo{font-size:20px;font-weight:500}
+.aphdr .back{background:rgba(255,255,255,.14);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:15px}
+.aphdr .tt{flex:1;font-weight:600;font-size:15px;min-width:0}
+.apbody{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.apfoot{padding:10px 14px;background:#fff;border-top:1px solid #eee;display:flex;flex-direction:column;gap:6px}
+.aptabs{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid #eee;padding:6px 0 10px;font-size:10px;text-align:center;color:#888}
+.aptabs div{display:flex;flex-direction:column;gap:1px;font-size:10px}
+.aptabs b{font-size:17px;font-weight:400}
+.aptabs .on{color:var(--red);font-weight:700}
+.sample{font-size:10px;background:#FFF1CC;color:#8A5E00;border-radius:5px;padding:2px 7px;font-weight:700;white-space:nowrap}
+/* content bits */
+.stack{display:flex;flex-direction:column;gap:12px}
+.pg2{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:16px;align-items:start}
+.app .pg2{grid-template-columns:minmax(0,1fr)}
+@media (max-width:760px){.web .pg2{grid-template-columns:minmax(0,1fr)}}
+.planc{background:linear-gradient(135deg,#123c50,#0b2a3a);color:#fff;border-radius:11px;padding:18px}
+.planc .n{font-size:19px;font-weight:700;margin:2px 0 6px}
+.row{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #f1f1f4;font-size:14.5px;font-weight:600}
+.row:last-child{border:none}
+.row .s{font-weight:400;color:#888;font-size:12.5px;display:block}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;border:1px solid #e4e4ea;background:#fff;color:#333;border-radius:10px;padding:12px;font-size:14.5px;font-family:inherit;cursor:pointer}
+.opt:hover{border-color:var(--red);background:#fff7f8}
+.opt .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--mint);font-size:18px;flex:none}
+.opt[aria-pressed="true"]{border-color:var(--teal2);background:var(--mint)}
+.opt small{display:block;color:#888;font-size:12px}
+.hero{background:#fff;border-radius:11px;box-shadow:0 1px 4px rgba(20,20,43,.07);padding:18px;display:flex;flex-direction:column;gap:12px}
+.hero.dark{background:linear-gradient(135deg,#123c50,#0b2a3a);color:#fff}
+.hero .big{font-size:38px;font-weight:900;line-height:1}
+.hero .lbl{font-size:12px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.hero.dark .lbl{color:#7fd8c8}
+.ringrow{display:flex;gap:14px;align-items:center}
+.facts{display:flex;flex-direction:column}
+.fact{display:flex;gap:10px;font-size:13.5px;padding:8px 0;border-top:1px solid #f0f0f3;align-items:flex-start}
+.hero.dark .fact{border-color:rgba(255,255,255,.14)}
+.fact .i{flex:none;width:22px;text-align:center}
+.bars{display:flex;align-items:flex-end;gap:8px;height:96px;padding-top:6px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;font-size:10.5px;color:#888}
+.bars i{display:block;width:100%;border-radius:4px 4px 0 0;background:#BFE8DF;min-height:3px}
+.bars div.cur i{background:var(--teal2)}
+.insight{background:var(--cream);border-radius:9px;padding:11px 13px;font-size:13.5px}
+.good{background:var(--mint);border-radius:9px;padding:11px 13px;font-size:13.5px}
+.warn{background:#FFF1F3;border-radius:9px;padding:11px 13px;font-size:13.5px}
+.sol{background:#fff;border-radius:11px;box-shadow:0 1px 4px rgba(20,20,43,.07);border:1.5px solid transparent;padding:14px;display:flex;flex-direction:column;gap:7px}
+.sol.best{border-color:var(--teal2)}
+.sol.open{border-color:var(--red)}
+.sol .hd{display:flex;gap:10px;align-items:flex-start}
+.sol .ic{font-size:22px;line-height:1}
+.sol h3{font-size:15.5px;margin:0}
+.sol .bd{font-size:13.5px;color:#555}
+.badge{display:inline-block;background:var(--mint);color:#0a7c6a;font-size:10.5px;font-weight:700;border-radius:4px;padding:2px 8px;margin-bottom:3px}
+.pt{font-size:9.5px;font-weight:800;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px;letter-spacing:.03em}
+.pt.chk{background:#FFE9D6;color:#9A4A00}.pt.new{background:#ECE7FF;color:#5B3FD0}.pt.live{background:#DDF3EE;color:#0A6B5B}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #ddd;background:#fafafa;color:#444;border-radius:16px;padding:7px 13px;font-size:13px;font-family:inherit;cursor:pointer}
+.chip[disabled]{cursor:default}.chip[disabled][aria-pressed="false"]{opacity:.4}
+.chip[aria-pressed="true"]{background:var(--teal2);border-color:var(--teal2);color:#fff;font-weight:600}
+.panel{background:#fafafc;border:1px solid #eee;border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:9px;font-size:13.5px}
+.tr{display:flex;gap:8px}.tr i{width:26px;height:26px;border-radius:50%;border:2px dashed #bbb;display:grid;place-items:center;font-style:normal;font-size:11px;color:#bbb}
+table.fit{width:100%;border-collapse:collapse;font-size:12.5px}
+table.fit th{text-align:left;color:#999;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;padding:4px 6px;border-bottom:1px solid #eee}
+table.fit td{padding:7px 6px;border-bottom:1px solid #f3f3f6}
+table.fit tr.me td{background:var(--mint);font-weight:600}
+input.f,textarea.f{width:100%;border:1px solid #ddd;border-radius:7px;padding:9px 11px;font:inherit;font-size:14px;background:#fff;color:#333;resize:none}
+.sw{display:flex;align-items:center;gap:12px}
+.sw button{width:50px;height:28px;border-radius:14px;border:none;background:#ccc;position:relative;flex:none;cursor:pointer}
+.sw button::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.sw button.on{background:var(--teal2)}.sw button.on::after{left:25px}
+.center{text-align:center;align-items:center}
+.emoji{font-size:46px;line-height:1}
+.gift{background:var(--cream);border:1.5px dashed var(--gold);border-radius:11px;padding:14px}
+.recap{background:linear-gradient(135deg,#123c50,#0b2a3a);color:#fff;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.recap .st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.recap .st b{display:block;font-size:22px;font-weight:900;color:#7fd8c8}
+.recap .st span{font-size:11px;opacity:.85}
+.act{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.web .act{max-width:420px;margin:6px auto 0;align-items:stretch}
+.cap{display:inline-block;background:#FFF1CC;color:#8A5E00;font-size:9.5px;font-weight:800;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.tiny{font-size:10px;font-weight:700;background:#ECE7FF;color:#5B3FD0;border-radius:4px;padding:1px 6px}
+.stars{display:flex;gap:6px}.star{border:none;background:none;font-size:34px;line-height:1;color:#d5d5dc;cursor:pointer;padding:0 2px}.star.on{color:#F5A623}
+.sec{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#9a9a9a;font-weight:700;margin-top:2px}
+</style>
+
+<div class="wrap">
+  <aside class="rail" aria-label="Prototype notes">
+    <div>
+      <div class="eyebrow">Prototype · first draft · v11</div>
+      <h1>Self-serve cancel flow with retention</h1>
+      <p style="margin-top:6px">Each reason gets its own page: one key number, then the matched solutions right under it. No human step.</p>
+    </div>
+    <div class="rc"><h3>View as</h3><div class="seg" id="devSeg"></div>
+      <p style="margin-top:6px;font-size:12px">Website is copied from your platform UI. The app layout is adapted from it, since I have only seen the web UI.</p></div>
+    <div class="rc"><h3>Try as</h3><div class="seg" id="personaSeg"></div><p style="margin-top:8px;font-size:12.5px" id="personaDesc"></p></div>
+    <div class="rc"><h3>Low-use rule (internal)</h3><div class="seg" id="thrSeg"></div>
+      <p style="margin-top:6px;font-size:12px">Members under this many hours in a month get the motivation-first path on the "not using it enough" page.</p></div>
+    <div class="rc"><h3>Comeback incentive</h3><div class="seg" id="incSeg"></div></div>
+    <div class="rc"><h3>Flow</h3><ol class="steps" id="steps"></ol></div>
+    <div class="rc"><h3>Why this screen</h3><div class="note" id="why"></div></div>
+    <div class="rc"><h3>Discount caps (proposed)</h3>
+      <ul class="plain">
+        <li><b>Maximum 25%</b> ("up to"). Each reason has its own limit below.</li>
+        <li>Cost, one-time offer: up to 25%, only for members with no practice in the last 30 days or more</li>
+        <li>Service, thank-you credits or days: up to 15% of monthly plan</li>
+        <li>Inactive, earn-back days: up to 10% of monthly plan</li>
+        <li>Comeback, after cancelling: up to 20% on first plan</li>
+        <li>Never stacked above 25% in one plan period. Refunds are not discounts.</li>
+      </ul><p style="margin-top:6px;font-size:12px">Only the 25% is from you. The split is my proposal; tell me what to change.</p></div>
+    <div class="rc"><h3>Ideas in this prototype</h3>
+      <ul class="plain">
+        <li><span class="ptag live">LIVE</span> already on Shvasa: pause, Find a buddy, Rookie level, Duo and Family accounts, plan types, discounts</li>
+        <li><span class="ptag" style="background:#FFE9D6;color:#9A4A00">TO CHECK</span> choosing a new teacher in Private classes, and whether it can be done as a trial: I do not know how it works today</li>
+        <li><span class="ptag new">NEW</span> would need building: 10-day restart, Stay Lite, gift your time, a free 1:1 at your hour, a new teacher with 2 free classes (private-plan members), level reset, thank-you plus a senior review of the feedback, thank-you credits, future-you note, recap card</li>
+      </ul>
+      <p style="margin-top:8px;font-size:12px">These ideas are mine, not ChatGPT's: I can't reach ChatGPT from here. Outside examples: <a href="https://blog.funnelfox.com/cancellation-flows-examples-and-best-practices/" target="_blank" rel="noopener">Headspace and Strava show a recap of what you lose</a>; <a href="https://subi.co/changelog/2026-07-14-cancellation-gift-treatment" target="_blank" rel="noopener">Subi offers a one-time free gift</a>.</p></div>
+    <div class="rc"><h3>Event log</h3><div class="log" id="log"></div></div>
+    <div class="rc"><h3>Open items</h3>
+      <ul class="plain">
+        <li>Prices are from <b>app.shvasa.com/pricing</b> (INR, read 22 Oct 2026). Shvasa Daily, single-focus and added-account prices are not on it, so they are illustrative or bracketed.</li>
+        <li>Refund rules used (yours): within 7 days of renewal and nothing attended or booked, 10% third-party fee. Otherwise only the price difference on a retention downgrade, plan duration unchanged. No refund for unused time.</li>
+        <li>Does the 10% fee also apply to the downgrade difference? Shown as [to be confirmed].</li>
+        <li>Escalation: who reviews it and the response time.</li>
+        <li>The exact discount % per reason (shown as [X]).</li>
+        <li>Do the 2 free classes for a new teacher count within the 15% thank-you cap?</li>
+        <li><span class="ph">[bracketed]</span> values are not decided yet.</li>
+        <li>Backend actions need sign-off from Vikalp. Refund and auto-renew rules need legal review (I'm not a lawyer).</li>
+      </ul></div>
+    <button class="linkbtn" id="resetBtn">Restart prototype</button>
+  </aside>
+  <main class="stage" id="stage"></main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const ph=t=>`<span class="ph">[${t}]</span>`;
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const fh=h=>(Math.round(h*10)/10)+' h';
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const il=t=>`${t} <span class="sample">illustrative</span>`;
+
+/* Discount caps. 25% is the ceiling you set; the split below is my proposal. */
+const CAPS={max:25,ladder:25,comp:15,earnback:10,comeback:20};
+const REFUND={days:7,fee:10};
+
+/* Plan prices from app.shvasa.com/pricing (read 22 Oct 2026, INR view). Daily and single-focus prices are not on that page: illustrative. */
+const PERSONAS={
+  regular:{label:'Regular',desc:'Monthly Live Classes plan (₹4,999). Practises weekly.',plan:'1 Month · Live Classes',price:4999,months:1,cls4:14,weeks:[3,3,4,3,4,3],classes:34,best:9,cur:9,ld:2,last:'2 days ago',since:{days:12,used:5},teachers:[['Patanjali',9],['Shwetha',7],['Deepika',4]],goal:'Build strength',unused:null,window:null,toRookie:null,flags:{coach:1}},
+  fading:{label:'Fading',desc:'12-month Nutrition + Live plan (₹59,999). Almost nothing lately.',plan:'12 Months · Nutrition + Live Classes',price:59999,months:12,cls4:6,weeks:[4,4,3,2,1,0],classes:18,best:6,cur:0,ld:26,last:'26 days ago',since:{days:20,used:0},teachers:[['Shruthi',8],['Sakshi',6]],goal:'Reduce stress',unused:null,window:null,toRookie:null,flags:{coach:1,nutri:1}},
+  barely:{label:'Barely used',desc:'Shvasa Daily, 30 credits. Almost nothing used. Price is illustrative.',plan:'Shvasa Daily · 30 credits / 30 days',price:3000,illus:true,months:1,cls4:1,weeks:[0,0,1.4,0,0,0],classes:1,best:1,cur:0,ld:19,last:'19 days ago',since:{days:19,used:1},teachers:[['Sakshi',1]],goal:'Reduce stress',unused:29,window:11,toRookie:0.6,flags:{}},
+  renewed:{label:'Just renewed',desc:'3-month Live plan (₹13,999) renewed 3 days ago. Nothing booked or attended since. Has a private package.',plan:'3 Months · Live Classes',price:13999,months:3,cls4:3,weeks:[1,1,2,1,0,0],classes:9,best:2,cur:0,ld:9,last:'9 days ago',since:{days:3,used:0},teachers:[['Patanjali',2]],goal:'Reduce stress',unused:null,window:null,toRookie:null,flags:{coach:1,private:1}},
+  renewedUsed:{label:'Renewed, booked',desc:'Same 3-month plan, renewed 3 days ago, but already booked classes on it.',plan:'3 Months · Live Classes',price:13999,months:3,cls4:3,weeks:[1,1,2,1,0,0],classes:9,best:2,cur:0,ld:2,last:'2 days ago',since:{days:3,used:2},teachers:[['Patanjali',2]],goal:'Reduce stress',unused:null,window:null,toRookie:null,flags:{coach:1}},
+  lapsed:{label:'Lapsed 41 days',desc:'Monthly Live plan (₹4,999). No class in the last 41 days.',plan:'1 Month · Live Classes',price:4999,months:1,cls4:0,weeks:[2,1,0,0,0,0],classes:22,best:4,cur:0,ld:41,last:'41 days ago',since:{days:12,used:0},teachers:[['Patanjali',6]],goal:'Build strength',unused:null,window:null,toRookie:null,flags:{}}
+};
+const REASONS=[
+ {k:'inactive',ic:'🛋️',t:"I'm not using it enough"},
+ {k:'renewal',ic:'🔁',t:"It renewed and I didn't expect that"},
+ {k:'service',ic:'🧘',t:"The service was not up to the mark"},
+ {k:'cost',ic:'💸',t:"It costs more than I want to spend"},
+ {k:'personal',ic:'🌿',t:"Personal reasons (travel, family, life)"},
+ {k:'other',ic:'💬',t:"Something else"}];
+const INC={
+ A:{label:'Bonus credits',title:`Bonus class credits are yours`,line:`Come back within ${ph('N')} days and we add credits worth up to ${CAPS.comeback}% of your first plan.`},
+ B:{label:'Welcome-back offer',title:`A welcome-back offer is reserved for you`,line:`Come back within ${ph('N')} days and take up to ${CAPS.comeback}% off your first plan.`}};
+const STEPS=['Manage plan','Reason','Your page','How to end','Done'];
+const WHY={
+ plan:'Cancel sits inside Me › My plan and is always reachable. Auto-renew state is plain to see, which is the first fix for renewal surprises.',
+ reason:'One tap. The reason decides the whole next page. The same tap is logged, so reasons finally become data.',
+ 'page-inactive':'Split by your rule. Under the threshold the problem is motivation, so we show their own thin numbers and offer commitment-style help. Above it, we show the trend and offer a restart. No class recommendations.',
+ 'page-renewal':'Two cases from your policy. Within 7 days: show the refund (10% third-party fee) in the open. After 7 days: say so plainly and offer ways to fix it. The auto-renew switch is on the page. The refund policy only applies if nothing was attended or booked on the renewed plan. A used plan is never refunded for unused time; a lighter plan returns only the price difference.',
+ 'page-service':'A 1 to 5 rating and free text, no category chips. Help shows once a rating is given. Private-plan members (detected from the account) get a new dedicated teacher with 2 free classes; group members never get a teacher change. Compensation is capped.',
+ 'page-cost':'No questions, solutions straight away. No per-class price (it makes people feel they overpay). Instead: what the plan has given them, what is still waiting, and how close the next milestone is. Then right-sizing before any discount; the only discount is one from the capped ladder.',
+ 'page-personal':'No pressure and no stats. Tap what is going on and the help changes. Nothing is lost.',
+ 'page-other':'Free text goes to the log. Pause and Lite are offered, and support is the fallback.',
+ saved:'Saved. Logged as retained with the reason and the solution used. This feeds the 20% target.',
+ exit:'Two honest endings. Stopping auto-renew keeps access to the end of the paid period and is the default. Ending today shows the exact refund under your policy.',
+ done:'Instant confirmation with a receipt. The comeback is a held benefit for returning, capped like every other offer.',
+ back:'One-tap return. Progress is restored. This is the comeback target (30%).'};
+
+let S,hist;
+function init(){S={rating:0,dev:'web',screen:'plan',persona:'regular',reason:null,open:null,saved:null,thr:4,inc:'A',exit:'stop',remind:'1 month',autorenew:true,chips:{},val:{},svcA:null,svcM:null,costS:null,persS:null,log:['session.start']};hist=[];render()}
+const P=()=>PERSONAS[S.persona];
+const mh=()=>sum(P().weeks.slice(-4));
+const low=()=>mh()<S.thr;
+const monthEq=()=>P().price/P().months;
+function money(p,n){return p.illus?il(inr(n)):inr(n)}
+function refundInfo(){const p=P(),inWin=p.since.days<=REFUND.days,used=p.since.used>0,fee=p.price*REFUND.fee/100;return {el:inWin&&!used,inWin,used,left:REFUND.days-p.since.days,fee,back:p.price-fee}}
+const LIGHT={'Shvasa Daily':3000,'Face yoga only':1500,'Pranayama only':1500};
+function lightOpts(){return Object.keys(LIGHT).filter(k=>!(k==='Shvasa Daily'&&P().plan.startsWith('Shvasa Daily')))}
+function lightInfo(name){const p=P(),mo=LIGHT[name];if(!mo)return null;return {name,mo,total:mo*p.months,diff:Math.max(p.price-mo*p.months,0)}}
+function unusedPart(){const p=P(),tot=p.months*30,left=Math.max(tot-p.since.days,0);return {left,tot}}
+function log(x){S.log.push(x)}
+function go(s){hist.push(S.screen);S.screen=s;S.open=null;S.saved=null;render();const b=document.querySelector('.apbody');if(b)b.scrollTo(0,0)}
+function back(){if(S.saved){S.saved=null;render();return}if(hist.length){S.screen=hist.pop();S.open=null;render()}}
+
+function ring(v,max,label){const r=34,c=2*Math.PI*r,p=Math.min(v/max,1);
+ return `<svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="${label}"><circle cx="44" cy="44" r="${r}" fill="none" stroke="#e8e8ee" stroke-width="9"/><circle cx="44" cy="44" r="${r}" fill="none" stroke="#17A88B" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" transform="rotate(-90 44 44)"/></svg>`}
+function bars(a){const mx=Math.max(...a,1);return `<div class="bars">${a.map((v,i)=>`<div class="${i>=a.length-4?'cur':''}"><span>${v?fh(v):''}</span><i style="height:${Math.max(v/mx*70,3)}px"></i><span>${i===a.length-1?'now':'-'+(a.length-1-i)+'w'}</span></div>`).join('')}</div>`}
+function chipRow(id,opts){return `<div class="chips">${opts.map(o=>`<button class="chip" data-a="chip" data-id="${id}" data-c="${o}" aria-pressed="${S.chips[id]===o}">${o}</button>`).join('')}</div>`}
+function qChips(key,opts,lock){return `<div class="chips">${opts.map(o=>`<button class="chip" ${lock?'disabled':`data-a="q" data-key="${key}" data-c="${o}"`} aria-pressed="${S[key]===o}">${o}</button>`).join('')}</div>${lock?'<div class="small">Answer locked so the help matches it. Use Back to change it.</div>':''}`}
+const tg=t=>t==='new'?'<span class="pt new">NEW</span>':'<span class="pt live">LIVE</span>';
+const capTag=n=>n?`<span class="cap">Cap ${n}%</span>`:'';
+
+/* ---------- solutions ---------- */
+function sol(id){const p=P(),u=p.unused,me=monthEq();
+const compVal=money(p,me*CAPS.comp/100),ebVal=money(p,me*CAPS.earnback/100);
+const un=unusedPart();
+const D={
+ earnback:{t:'new',cap:CAPS.earnback,ic:'🏁',title:'Earn time back with a 10-day restart',
+  body:`Practise ${ph('3')} times in ${ph('10')} days and we add days worth up to ${CAPS.earnback}% of your monthly plan (about ${ebVal}). You earn it by practising.`,
+  panel:()=>`<div class="tr">${[1,2,3].map(n=>`<i>${n}</i>`).join('')}</div><div class="small">Each session you attend ticks a circle. Reward is days added, never a cash discount.</div>`,
+  cta:'Start my 10-day restart',ok:['Your restart has begun','Your tracker is on your dashboard. Each session ticks one circle.']},
+ buddy:{t:'live',ic:'🤝',title:'Practise with a buddy',
+  body:'We match you with a member at a similar level and similar times. You set weekly goals together and see each other show up.',
+  panel:()=>`<div class="small">Uses the existing Find a buddy feature. You can leave a match any time.</div>`,
+  cta:'Find my buddy',ok:['Matching you now','Your matches will appear in Find a buddy.']},
+ pause:{t:'live',ic:'⏸️',title:'Pause instead, keep everything',
+  body:u?`Freeze your ${u} unused credits and push their end date out by the length of the pause.`:'Freeze your plan. Your streak, level and community stay put, and your end date moves out.',
+  panel:()=>`<div class="sec">Come back on</div>${chipRow('pause',['2 weeks','1 month','Pick a date'])}<div class="small">Auto-resume with a reminder before it happens. Maximum pause ${ph('to be decided')}. If you have Family or Duo accounts, the pause applies to all of them.</div>`,
+  cta:'Confirm pause',ok:['Plan paused','We will remind you before it resumes. You can resume early in one tap.']},
+ extend:{t:'new',ic:'⏳',title:'Add time so no credit is wasted',
+  body:`Your ${u||'unused'} credits end in ${p.window||'a few'} days. Add ${ph('N')} days so you can still use them.`,
+  panel:()=>`<div class="small">Offered once per plan period. Rule and eligibility ${ph('to be decided')}.</div>`,
+  cta:'Add the time',ok:['Time added','Your new end date is on your plan page.']},
+ lite:{t:'new',ic:'🪷',title:'Stay Lite: keep your account, drop live classes',
+  body:`Keep your community, journal, habit tracker and progress for ${ph('price')}/month. Go back to live classes any time.`,
+  panel:()=>`<div class="box">Included: ${ph('to be decided')}. Live classes are not included. If Lite costs less than your plan, you get the price difference back and your end date stays the same.</div>`,
+  cta:'Switch to Lite',ok:['You are on Lite','Your progress, streak and community stay. Upgrade to live classes whenever you like.']},
+ gift:{t:'new',ic:'🎁',title:'Gift your remaining time to someone',
+  body:`Pass your unused plan time to a friend or family member. They start practising; your progress stays saved.`,
+  panel:()=>`<label class="small">Their email</label><input class="f" data-v="giftmail" placeholder="name@email.com" value="${(S.val.giftmail||'').replace(/"/g,'')}"><div class="small">What transfers and how much ${ph('to be decided')}. Works like a Seva pass.</div>`,
+  cta:'Send the gift',ok:['Gift on its way','They will get an invite with your remaining time. Your progress stays saved.']},
+ family:{t:'live',ic:'👨‍👩‍👧',title:'Add a family member or friend to your plan',
+  body:`Add an account under yours (Duo, or Family & Friends). They get their own login and their own progress. Start date, end date and pauses stay the same for everyone on the plan.`,
+  panel:()=>`<label class="small">Their email</label><input class="f" data-v="fammail" placeholder="name@email.com" value="${(S.val.fammail||'').replace(/"/g,'')}"><div class="small">Price for an added account ${ph('price')}. You stay the primary account holder.</div>`,
+  cta:'Add an account',ok:['Account added','Your family member gets an invite. Dates and pauses now apply to both of you.']},
+ lighter:{t:'live',ic:'🪶',title:'Keep practising on a lighter plan',
+  body:'Move to a lighter plan: a single-focus plan (face yoga or pranayama) or Shvasa Daily. You get the price difference back, and your plan end date stays exactly the same.',
+  panel:()=>{const opts=lightOpts(),pick=S.chips.lighter&&opts.includes(S.chips.lighter)?S.chips.lighter:null,li=pick?lightInfo(pick):null;
+   return `<div class="sec">Choose</div>${chipRow('lighter',opts)}
+   ${li?`<div class="box" style="display:grid;gap:5px"><div style="display:flex;justify-content:space-between"><span>Your current plan</span><b>${money(p,p.price)}</b></div>
+   <div style="display:flex;justify-content:space-between"><span>${li.name}, same ${p.months} month${p.months>1?'s':''}</span><b>${il(inr(li.total))}</b></div>
+   <div style="display:flex;justify-content:space-between;border-top:1px solid #ddd;padding-top:5px"><span><b>Refunded to you</b> (the difference)</span><b>${li.diff>0?il(inr(li.diff)):'Nothing'}</b></div>
+   <div class="small">Plan end date: <b>unchanged</b>. Only the difference between the two plans is refunded; unused time on a plan is never refunded.</div></div>`:'<div class="small">Pick a plan to see exactly what comes back to you.</div>'}
+   <div class="small">Lighter-plan prices are illustrative (Shvasa Daily ₹3,000 and single-focus ₹1,500 a month). Whether the ${REFUND.fee}% third-party fee also applies to this refund ${ph('to be confirmed')}.</div>`},
+  cta:'Switch to the lighter plan',ok:['Plan switched',`You are on the lighter plan now, with the same end date. The price difference is on its way back to you. Progress and streak come with you.`]},
+ yearly:{t:'live',ic:'📆',title:p.months>1?'Switch to monthly billing':'Switch to a longer plan and pay less per month',
+  body:p.months>1?'Pay month to month instead of one big charge.':'12 months is ₹3,333 a month against ₹4,999 on the monthly plan.',
+  panel:()=>`<div class="small">Prices from the pricing page. Takes effect at your next renewal.</div>`,cta:'Change billing',ok:['Billing updated','A confirmation is on its way to your email.']},
+ ladder:{t:'live',cap:CAPS.ladder,ic:'🏷️',title:`A one-time ${CAPS.ladder}% off your next renewal`,
+  body:`Up to ${CAPS.ladder}% off your next renewal, about ${money(p,p.price*CAPS.ladder/100)}. Shown once per plan period, from the one approved ladder.`,
+  panel:()=>`<div class="box">Your offer: ${ph('X')}% off. The exact percentage is set by our rules for your situation, never picked by the member. Maximum ${CAPS.max}%.</div><div class="small">Only for members with no practice in the last 30 days or more. Single use. Cannot be combined with other offers. Logged on your account so it is never repeated. Total across all offers never goes above ${CAPS.max}%.</div>`,cta:'Apply offer',ok:['Offer applied','It is on your plan and shows on your receipt.']},
+ comp:{t:'new',cap:CAPS.comp,ic:'🙏',title:'A thank-you for the experience',
+  body:`We'd like to make it up to you: bonus class credits or days worth up to ${CAPS.comp}% of your monthly plan (about ${compVal}).`,
+  panel:()=>`<div class="sec">Choose</div>${chipRow('comp',['Bonus credits','Extra days'])}<div class="small">Given together with the fix above, once per plan period. Total across all offers never goes above ${CAPS.max}%.</div>`,
+  cta:'Accept thank-you',ok:['Added to your account','It is on your plan page now.']},
+ oneone:{t:'live',ic:'👤',title:'A complimentary 1:1 session',
+  body:`One private session with a teacher you choose, so you can get the attention you wanted.`,
+  panel:()=>`<div class="small">Counts as part of the compensation cap. Pick any teacher and time.</div>`,cta:'Claim session',ok:['Session reserved','Pick your slot from Private classes.']},
+ variety:{t:'new',ic:'🎨',title:'A style tasting week',
+  body:'Five different class styles in seven days: yoga, strength, dance fitness, pranayama and philosophy. Find what you look forward to.',
+  panel:()=>`<div class="small">Picks are made for your usual times.</div>`,cta:'Start the week',ok:['Tasting week started','Your five picks are on your dashboard.']},
+ level:{t:'new',ic:'📈',title:'Reset your level',
+  body:'Retake a short level check and get a track that is not too easy and not too hard.',
+  panel:()=>`<div class="small">Takes a few minutes.</div>`,cta:'Start the check',ok:['Level check ready','Your new track appears on your dashboard.']},
+ slotclass:{t:'new',cap:CAPS.comp,ic:'🕐',title:S.reason==='personal'?'A complimentary 1:1 class at your destination hour':'A complimentary 1:1 class at the hour that works for you',
+  body:S.reason==='personal'?'Tell us where you are going. We book one private session with a teacher at a time that suits you there, so your practice does not break while you travel.':'No group class lands at your hour? Pick the hour that never works and we book a private session with a teacher who is free then. The hour you ask for also goes to scheduling, so we learn which hours are missing.',
+  panel:()=>`<div class="sec">Your hour</div>${chipRow('slot',['Early morning','Late morning','Afternoon','Evening','Late night'])}<label class="small">Your time zone</label><input class="f" data-v="tz" placeholder="e.g. Dubai, Toronto" value="${(S.val.tz||'').replace(/"/g,'')}"><div class="small">One session per plan period. Counts toward the thank-you cap of ${CAPS.comp}%. Teacher availability at each hour ${ph('to be confirmed')}.</div>`,
+  cta:'Book my session',ok:['Session being booked','You will see the confirmed teacher and time in Private classes. Your hour is logged for scheduling.']},
+ topteachers:{t:'new',ic:'⭐',title:'Follow the teachers who suit you',
+  body:'You are not tied to one teacher. We show top-rated teachers in your style and alert you when they take a class at your time.',
+  panel:()=>`<div class="small">Based on the classes you have attended and rated.</div>`,cta:'Show my teachers',ok:['Teachers followed','You will get an alert when they teach at your usual time.']},
+ escalate:{t:'new',cap:CAPS.comp,ic:'🙏',title:'A thank-you from us, and a senior team member reviews your feedback',
+  body:`We are sorry. You get a token of appreciation worth up to ${CAPS.comp}% of your monthly plan (about ${compVal}), and a senior member of our team looks into what happened.`,
+  panel:()=>`<div class="sec">Choose your token of appreciation</div>${chipRow('comp',['Bonus credits','Extra days'])}
+   <div class="small">Your rating and notes go with it. We keep a record of every case so we can learn from it. Response time ${ph('to be decided')}. Once per plan period; total offers never go above ${CAPS.max}%.</div>`,
+  cta:'Accept and send my feedback',ok:['Thank you. It is sent.','Your thank-you is on your plan page and a senior team member will look into your feedback.']},
+ switchnutri:{t:'live',ic:'🥗',title:'Switch your nutrition coach',
+  body:'A different nutrition coach, with your goals, logs and history passed across so you do not start over.',
+  panel:()=>`<div class="small">Your meal tracking history stays.</div>`,cta:'Request a new coach',ok:['New coach requested','Your history moves across.']},
+ planreset:{t:'new',ic:'📋',title:'Rebuild your nutrition plan',
+  body:'A fresh plan based on what has and has not worked, with a review call at two weeks.',
+  panel:()=>`<div class="small">Included in your plan.</div>`,cta:'Rebuild my plan',ok:['Plan rebuild booked','Your coach will share it within your plan\'s response time.']},
+ newteacher:{t:'new',ic:'🧑‍🏫',title:'Try a new dedicated teacher: 2 free 60-minute classes',
+  body:'You take private classes with us, so your teacher matters. Choose a new dedicated teacher and take 2 free 60-minute classes with them before you decide.',
+  panel:()=>`<div class="small">Teachers are listed by style and time. Whether these 2 credits count within the thank-you cap ${ph('to be decided')}. Offered once per plan period.</div>`,cta:'Choose my new teacher',ok:['Two free classes added','Pick your new teacher from Private classes. Your 2 credits are on your account.']},
+ support:{t:'live',ic:'💬',title:'Talk to our support team',
+  body:'If none of this fits, a person will help. Your request is logged so nothing gets lost.',
+  panel:()=>`<div class="small">Response time ${ph('to be decided')}.</div>`,cta:'Contact support',ok:['Request sent','We will reach you on your registered email.']}
+};
+return {id,...D[id]}}
+
+const SVC={
+ 'Yoga classes':{opts:['Variety','Level','Timings','Teaching quality','Attention'],fix:{'Variety':'variety','Level':'level','Timings':'slotclass','Teaching quality':'topteachers','Attention':'oneone'}},
+ 'My personal coach':{opts:['Follow-up','Not a good fit'],fix:{'Follow-up':'escalate','Not a good fit':'escalate'}},
+ 'Nutrition coach':{opts:['Slow replies','Plan did not suit me'],fix:{'Slow replies':'escalate','Plan did not suit me':'escalate'}}
+};
+function svcAreas(){const f=P().flags,a=['Yoga classes'];if(f.coach)a.push('My personal coach');if(f.nutri)a.push('Nutrition coach');return a}
+
+function solsFor(){const r=S.reason,p=P();
+ if(r==='inactive'){
+  if(low())return ['earnback','lighter','buddy',p.unused?'extend':'pause'].map(sol);
+  return ['earnback','buddy','pause'].map(sol)}
+ if(r==='renewal'){return (p.months>1?['lighter','gift','yearly']:['lighter','gift']).map(sol)}
+ if(r==='service'){if(!S.rating)return [];return (p.flags.private?['newteacher','escalate']:['escalate','oneone']).map(sol)}
+ if(r==='cost'){return (p.ld>=30?['lighter','lite','ladder']:['lighter','lite']).map(sol)}
+ if(r==='personal'){
+  const m=S.persS;if(!m)return [];
+  if(m==='Travelling')return ['slotclass','pause','lite'].map(sol);
+  if(m==='Family or health')return ['pause','gift','lite'].map(sol);
+  if(m==='Busy period')return ['pause','lighter','earnback'].map(sol);
+  return ['pause','gift','lite'].map(sol)}
+ return ['pause','lite','support'].map(sol)}
+
+/* ---------- heroes ---------- */
+function hero(){const p=P(),r=S.reason,h=mh();
+ if(r==='inactive'){
+  if(low()){
+   const facts=[];
+   facts.push(['💸',`About <b>${money(p,p.price/Math.max(h,.1)/p.months)}</b> per hour practised so far`]);
+   if(p.unused)facts.push(['🎟️',`<b>${p.unused} of 30 credits unused</b>, and they end in <b>${p.window} days</b>`]);
+   else facts.push(['🗓️',`Last class <b>${p.last}</b>. Your plan has ${unusedPart().left} days left`]);
+   facts.push(['🎯',`You joined to: <b>${p.goal}</b> <span class="sample">sample</span>`]);
+   if(p.toRookie)facts.push(['✾',`You are <b>${p.toRookie} hrs from Rookie level</b>. That is less than one 60-minute class.`]);
+   return `<div class="hero dark"><div class="lbl">This month</div>
+    <div class="ringrow">${ring(h,S.thr,'progress')}<div><div class="big">${fh(h)}</div><div style="font-size:13px;opacity:.9">of ${fh(S.thr)} ${ph('month goal wording')}</div></div></div>
+    <div class="facts">${facts.map(f=>`<div class="fact"><span class="i">${f[0]}</span><span>${f[1]}</span></div>`).join('')}</div></div>`}
+  const mx=Math.max(...p.weeks);
+  return `<div class="hero"><div class="lbl">Your practice, last 6 weeks</div>${bars(p.weeks)}
+   <div class="insight">Your busiest week was <b>${fh(mx)}</b>. Last week was <b>${fh(p.weeks[5])}</b>. That is the gap a restart closes.</div>
+   <div class="facts"><div class="fact"><span class="i">🔥</span><span>Best streak <b>${p.best} weeks</b>. It is saved, not lost.</span></div><div class="fact"><span class="i">🗓️</span><span>Last class <b>${p.last}</b></span></div></div></div>`}
+ if(r==='renewal'){
+  const rf=refundInfo();
+  const head=`<div class="lbl">Your renewal</div><div class="small">${p.plan}</div>
+   <div><div class="big" style="font-size:30px">${money(p,p.price)}</div><div class="small" style="margin-top:4px">charged ${p.since.days} day${p.since.days===1?'':'s'} ago · ${p.since.used?`${p.since.used} class${p.since.used===1?'':'es'} attended or booked since`:'nothing attended or booked since'}</div></div>`;
+  const sw=`<div class="sw"><button class="${S.autorenew?'on':''}" data-a="renewtoggle" aria-label="Auto-renew" aria-pressed="${S.autorenew}"></button><div><b>Auto-renew is ${S.autorenew?'ON':'OFF'}</b><div class="small">${S.autorenew?`Next charge ${ph('date')}. Switch it off here.`:`No further charge. You keep access until ${ph('end date')}.`}</div></div></div>${S.autorenew?'':`<div class="good">✓ Done. You can turn it back on any time.</div>`}`;
+  const win=rf.el?`<div class="good"><b>Refund window is open: ${rf.left} day${rf.left===1?'':'s'} left</b>
+    <table class="fit" style="margin-top:6px"><tr><td>Charged</td><td style="text-align:right">${money(p,p.price)}</td></tr><tr><td>${REFUND.fee}% third-party fee</td><td style="text-align:right">− ${money(p,rf.fee)}</td></tr><tr class="me"><td>You get back</td><td style="text-align:right">${money(p,rf.back)}</td></tr></table>
+    <div class="small" style="margin-top:4px">Want it? Continue to cancel below and we refund it on the next step.</div></div>`
+   :rf.inWin?`<div class="insight"><b>The refund policy no longer applies.</b> You have attended or booked a class on the renewed plan, so a refund is not available. Moving to a lighter plan below still returns the price difference.</div>`
+   :`<div class="insight">The ${REFUND.days}-day refund window closed ${p.since.days-REFUND.days} day${p.since.days-REFUND.days===1?'':'s'} ago, and a used plan is not refunded. Moving to a lighter plan below returns the price difference.</div>`;
+  return `<div class="hero">${head}${sw}${win}</div>`}
+ if(r==='service'){
+  return `<div class="hero"><div class="lbl">Tell us how it went</div>
+   <div class="sec">Rate the service</div>
+   <div class="stars" role="radiogroup" aria-label="Rating out of 5">${[1,2,3,4,5].map(n=>`<button class="star ${S.rating>=n?'on':''}" data-a="rate" data-n="${n}" role="radio" aria-checked="${S.rating===n}" aria-label="${n} star${n>1?'s':''}">★</button>`).join('')}</div>
+   <div class="small">${S.rating?`You rated it ${S.rating} out of 5.`:'1 is poor, 5 is excellent.'}</div>
+   <div class="sec">Anything you want to add?</div>
+   <textarea class="f" rows="4" data-v="svcText" placeholder="Optional. Tell us what happened, in your own words.">${(S.val.svcText||'').replace(/</g,'&lt;')}</textarea>
+   ${S.rating?'':'<div class="small">Give a rating to see help that fits.</div>'}</div>`}
+ if(r==='cost'){
+  const hrs=sum(p.weeks),inc=['Live classes, 24x7','Health toolkit, journal and habit tracker','Community of members'];
+  if(p.flags.coach)inc.push('Your personal coach');if(p.flags.nutri)inc.push('Your nutrition coach');if(p.flags.private)inc.push('Your private class package');
+  const wait=p.unused?`<b>${p.unused} credits</b> still waiting, for the next ${p.window} days`:`<b>${unusedPart().left} days</b> left on your plan`;
+  const next=p.toRookie?`<b>${p.toRookie} hrs</b> from Rookie level, less than one class`:`Your best streak is <b>${p.best} ${p.unused?'days':'weeks'}</b>. It is saved.`;
+  return `<div class="hero dark"><div class="lbl">What your plan has built</div>
+   <div class="recap" style="background:rgba(255,255,255,.08)"><div class="st"><div><b>${p.classes}</b><span>classes</span></div><div><b>${fh(hrs)}</b><span>practised</span></div><div><b>${p.best}</b><span>best streak</span></div></div></div>
+   <div class="facts"><div class="fact"><span class="i">🎟️</span><span>${wait}</span></div><div class="fact"><span class="i">✾</span><span>${next}</span></div></div>
+   <div class="sec" style="color:#9fd8cc">Included with your plan</div>
+   <div class="facts">${inc.map(x=>`<div class="fact"><span class="i">✓</span><span>${x}</span></div>`).join('')}</div>
+   <div style="font-size:13px;opacity:.9">If you leave, this progress is kept for ${ph('N')} days. If your budget is the issue, there are ways to keep going for less.</div></div>`}
+ if(r==='personal'){
+  const lines=[['🔥',`Your ${p.best}-${p.unused?'day':'week'} best streak`],['✾','Your level and progress'],['📓','Journal and habit history'],['👥','Your place in the community']];
+  return `<div class="hero dark"><div class="lbl">Held for you</div><div style="font-size:19px;font-weight:700">Nothing is lost. Life comes first.</div>
+   <div class="facts">${lines.map(f=>`<div class="fact"><span class="i">${f[0]}</span><span>${f[1]}</span></div>`).join('')}</div>
+   <div style="font-size:13px;opacity:.9">${p.unused?`${p.unused} credits left for ${p.window} days`:`Your plan has ${unusedPart().left} days left`}</div></div>
+   <div class="hero"><div class="sec">What's going on?</div>${qChips('persS',['Travelling','Family or health','Busy period'],!!S.persS)}${S.persS?'':'<div class="small">Tap one to see help that fits.</div>'}</div>`}
+ return `<div class="hero"><div class="lbl">Tell us in your words</div><textarea class="f" rows="3" data-v="other" placeholder="What's going on?">${(S.val.other||'').replace(/</g,'&lt;')}</textarea></div>`}
+
+/* ---------- screens ---------- */
+function screenPlan(){const p=P();return {title:'My plan',crumb:'Me › <b>My plan</b>',main:`<div class="stack" style="max-width:680px;${S.dev==='web'?'margin:0 auto;width:100%':''}">
+ <div class="planc"><div class="small" style="color:#9fd8cc;text-transform:uppercase;letter-spacing:.6px">Your plan</div><div class="n">${p.plan}</div><div style="font-size:13px;opacity:.9">Auto-renew ${S.autorenew?'ON · next charge '+ph('date'):'OFF · access until '+ph('end date')}</div></div>
+ <div class="card" style="padding:4px 14px">
+  <div class="row"><span>🔁</span><span style="flex:1">Auto-renew<span class="s">${S.autorenew?'On. You can switch it off any time.':'Off.'}</span></span></div>
+  <div class="row"><span>⏸️</span><span style="flex:1">Pause plan<span class="s">Freeze credits and keep your progress</span></span></div>
+  <div class="row"><span>🧾</span><span style="flex:1">Billing and receipts</span></div></div>
+ <button class="link grey" data-a="start" style="align-self:center">Cancel plan</button></div>`,act:''}}
+function screenReason(){return {title:'Before you go',crumb:'Me › My plan › <b>Cancel</b>',main:`<div class="stack" style="max-width:640px;${S.dev==='web'?'margin:0 auto;width:100%':''}">
+ <div><h2 class="t">What's the main reason?</h2><p class="small">One tap. We'll show help that fits.</p></div>
+ ${REASONS.map(r=>`<button class="opt" data-a="reason" data-k="${r.k}"><span class="ic">${r.ic}</span><span>${r.t}</span></button>`).join('')}
+ <button class="link grey" data-a="exit" style="align-self:center">Skip and continue to cancel</button></div>`,act:''}}
+let lastLog='';function log_once(x){if(lastLog!==x){lastLog=x;log(x)}}
+function screenPage(){
+ const r=S.reason;
+ if(S.saved){const s=S.saved;return {title:'All set',crumb:'Me › My plan › Cancel › <b>Saved</b>',main:`<div class="stack center" style="padding:30px 0;max-width:520px;margin:0 auto"><div class="emoji">✅</div><h2 class="t">${s.ok[0]}</h2><p class="small" style="font-size:14px">${s.ok[1]}</p><div class="good" style="width:100%;text-align:left">You're staying. Your progress, streak and community are all still here.</div><button class="btn btn-red block" data-a="finish">Back to my plan</button></div>`,act:''}}
+ const sols=solsFor();
+ if(sols.length)log_once('offers.shown '+r+' '+S.persona+' ['+sols.map(s=>s.id).join(',')+']');
+ const lead={inactive:low()?"You've only just started. Here is what would help.":'Life got busy. Here is how to restart.',renewal:"We're sorry it caught you off guard. You can fix it right here.",service:"Thanks for telling us. Let's make it right.",cost:"Let's make it fit your budget.",personal:'We hope everything is okay. Nothing has to be lost.',other:'A few things that might help.'}[r];
+ const solHtml=sols.map((s,i)=>{const open=S.open===s.id;return `<div class="sol ${i===0?'best':''} ${open?'open':''}">
+   ${i===0?'<span class="badge">Best fit for you</span>':''}
+   <div class="hd"><span class="ic">${s.ic}</span><div style="flex:1;min-width:0"><h3>${s.title}${tg(s.t)}${capTag(s.cap)}</h3><div class="bd">${s.body}</div></div></div>
+   ${open?`<div class="panel">${s.panel()}</div>`:''}
+   <button class="btn ${open?'btn-red':(i===0?'btn-teal':'btn-out')} block" data-a="${open?'accept':'open'}" data-id="${s.id}">${open?s.cta:(i===0?'Choose this':'See details')}</button></div>`}).join('');
+ const renewDone=r==='renewal'&&!S.autorenew;
+ const hint=r==='service'?'Matched to your feedback':(r==='inactive'&&low()?'Ways to restart, not just to stay':'Matched to your reason');
+ const main=`<div class="${S.dev==='web'?'pg2':'stack'}"><div class="stack">${S.dev==='web'?`<div><h2 class="t">${lead}</h2></div>`:''}${hero()}</div>
+  <div class="stack">${S.dev==='app'?`<h2 class="t" style="margin-bottom:-4px">${lead}</h2>`:''}${sols.length?`<div class="sec">${hint}</div>${solHtml}`:`<div class="card"><b>Tell us a little more</b><p class="small" style="margin-top:4px">${r==='service'?'Give a rating':'Answer the question'}${S.dev==='web'?' on the left':' above'} and we will show the help that fits.</p></div>`}
+  ${renewDone?`<button class="btn btn-teal block" data-a="renewdone">Done, keep access until ${ph('end date')}</button>`:''}</div></div>`;
+ const act=`<div class="act"><button class="btn btn-grey block" data-a="exit">No thanks, continue to cancel</button><button class="link grey" data-a="help">Need help? Talk to support</button></div>`;
+ return {title:'Your options',crumb:'Me › My plan › Cancel › <b>Your options</b>',main,act}}
+
+function screenExit(){const p=P(),rf=refundInfo();
+ const nowSub=rf.el?`Refund of <b>${money(p,rf.back)}</b> (${money(p,p.price)} less the ${REFUND.fee}% third-party fee of ${money(p,rf.fee)}). ${ph('refund timeline')}`:(rf.inWin&&rf.used?`You have attended or booked on this plan, so the refund policy does not apply. No refund. Access ends today.`:`Outside the ${REFUND.days}-day refund window, so no refund. Access ends today.`);
+ return {title:'How to end',crumb:'Me › My plan › Cancel › <b>Confirm</b>',main:`<div class="stack" style="max-width:600px;${S.dev==='web'?'margin:0 auto;width:100%':''}">
+ <h2 class="t">Two ways to end your plan</h2>
+ <button class="opt" data-a="exitpick" data-v="stop" aria-pressed="${S.exit==='stop'}"><span class="ic">🔕</span><span><b>Stop auto-renew</b> · recommended<small>Keep full access until ${ph('end date')}. Nothing more is charged.</small></span></button>
+ <button class="opt" data-a="exitpick" data-v="now" aria-pressed="${S.exit==='now'}"><span class="ic">⏹️</span><span><b>End access today</b><small>${nowSub}</small></span></button>
+ <div class="insight">Your streak, level, journal and habit history are kept for ${ph('N')} days after your access ends.</div></div>`,
+ act:`<div class="act"><button class="btn btn-red block" data-a="confirmExit">Confirm</button><button class="link grey" data-a="exitback">Wait, show me the options again</button></div>`}}
+function screenDone(){const p=P(),inc=INC[S.inc],rf=refundInfo();return {title:'Done',crumb:'Me › My plan › Cancel › <b>Done</b>',main:`<div class="stack" style="max-width:600px;${S.dev==='web'?'margin:0 auto;width:100%':''}">
+ <div class="stack center"><div class="emoji">👋</div><h2 class="t">${S.exit==='stop'?'Auto-renew is off':'Your plan has ended'}</h2>
+ <p class="small" style="font-size:14px">${S.exit==='stop'?`Keep practising until ${ph('end date')}. A receipt is in your email.`:(rf.el?`Your refund of ${money(p,rf.back)} is on its way. A receipt is in your email.`:`A confirmation and receipt are in your email.`)}</p></div>
+ <div class="recap"><div class="caps" style="color:#7fd8c8">Your Shvasa chapter ${tg('new')}</div><div class="st"><div><b>${p.classes}</b><span>classes</span></div><div><b>${fh(sum(p.weeks))}</b><span>practised</span></div><div><b>${p.best}</b><span>best streak</span></div></div><div class="small" style="color:#cde">A card you can keep or share. <span class="sample">sample data</span></div></div>
+ <div class="gift"><b>🎁 ${inc.title}</b> ${tg('new')}${capTag(CAPS.comeback)}<p style="margin-top:4px;font-size:13.5px">${inc.line}</p></div>
+ <div class="card"><b>A note to future you</b> ${tg('new')}<p class="small" style="margin:4px 0 8px">Write a line. We send it back to you on the day you choose.</p>
+  <textarea class="f" rows="2" data-v="future" placeholder="e.g. You felt calmer after three weeks. Go back.">${(S.val.future||'').replace(/</g,'&lt;')}</textarea></div>
+ <div class="sec">Send it to me in</div>
+ <div class="chips">${['2 weeks','1 month','3 months','No reminders'].map(c=>`<button class="chip" data-a="remind" data-c="${c}" aria-pressed="${S.remind===c}">${c}</button>`).join('')}</div>
+ <p class="small">Only if you choose. Reminders always show your progress and what's coming up.</p></div>`,
+ act:`<div class="act"><button class="btn btn-teal block" data-a="comeback">See the one-tap return (demo)</button><button class="link grey" data-a="restart">Finish</button></div>`}}
+function screenBack(){const p=P(),inc=INC[S.inc];return {title:'Welcome back',crumb:'Me › <b>Welcome back</b>',main:`<div class="stack" style="max-width:600px;${S.dev==='web'?'margin:0 auto;width:100%':''}">
+ <h2 class="t">Good to see you again 🌿</h2><p class="small" style="font-size:14px">Everything is exactly where you left it.</p>
+ <div class="recap"><div class="st"><div><b>${p.classes}</b><span>classes</span></div><div><b>${fh(sum(p.weeks))}</b><span>practised</span></div><div><b>${p.best}</b><span>best streak</span></div></div></div>
+ ${S.val.future?`<div class="insight"><b>Your note to yourself:</b><br>“${S.val.future.replace(/</g,'&lt;')}”</div>`:''}
+ <div class="gift"><b>🎁 ${inc.title}</b>${capTag(CAPS.comeback)}<p style="margin-top:4px;font-size:13.5px">Applied automatically to your first plan or pack.</p></div></div>`,
+ act:`<div class="act"><button class="btn btn-red block" data-a="restart">Reactivate my plan</button></div>`}}
+
+const SCR={plan:screenPlan,reason:screenReason,page:screenPage,exit:screenExit,done:screenDone,back:screenBack};
+const STEPMAP={plan:0,reason:1,page:2,exit:3,done:4,back:4};
+
+function chrome(sc){
+ if(S.dev==='web'){
+  return `<div class="browser"><div class="bchrome"><i></i><i></i><i></i><span>app.shvasa.com/profile/my-plan</span></div>
+  <div class="plat web"><div class="appnav"><span class="logo">shvasa</span><div class="items"><span class="ni hide">Dashboard</span><span class="ni hide">Pricing</span><span class="ni hide">My Classes</span><span class="ni hide">Community</span><span class="ni hide">Explore</span><span class="bk">Book Class</span><span class="av">P</span><span class="ni on">Me</span></div></div>
+  <div class="webbody"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="crumb" style="margin:0;flex:1">${sc.crumb}</div><span class="sample">Sample data</span></div>${sc.main}${sc.act?`<div style="margin-top:14px">${sc.act}</div>`:''}</div></div></div>`}
+ const showBack=hist.length||S.saved;
+ const tabs=[['🏠','Home'],['📅','Book'],['🗂️','My Classes'],['👥','Community'],['🙂','Me']];
+ return `<div class="phone"><div class="plat app"><div class="aphdr">${showBack?'<button class="back" data-a="back" aria-label="Back">←</button>':'<span class="logo">shvasa</span>'}<span class="tt">${showBack?sc.title:''}</span><span class="sample">Sample data</span></div>
+ <div class="apbody">${sc.main}</div>${sc.act?`<div class="apfoot">${sc.act}</div>`:''}
+ <div class="aptabs">${tabs.map(t=>`<div class="${t[1]==='Me'?'on':''}"><b>${t[0]}</b>${t[1]}</div>`).join('')}</div></div></div>`}
+
+function render(){
+ const sc=SCR[S.screen]();
+ $('stage').innerHTML=chrome(sc);
+ $('steps').innerHTML=STEPS.map((s,i)=>`<li class="${i===STEPMAP[S.screen]?'on':''}"><i>${i+1}</i>${s}</li>`).join('');
+ const wk=S.screen==='page'?(S.saved?'saved':'page-'+S.reason):S.screen;
+ $('why').textContent=WHY[wk]||'';
+ $('devSeg').innerHTML=[['web','Website'],['app','App']].map(d=>`<button data-a="dev" data-k="${d[0]}" aria-pressed="${S.dev===d[0]}">${d[1]}</button>`).join('');
+ $('personaSeg').innerHTML=Object.entries(PERSONAS).map(([k,v])=>`<button data-a="persona" data-k="${k}" aria-pressed="${S.persona===k}">${v.label}</button>`).join('');
+ $('personaDesc').textContent=P().desc+' Sample data, not real users. This month: '+fh(mh())+(low()?' (low use).':'.');
+ $('thrSeg').innerHTML=[3,4,5].map(n=>`<button data-a="thr" data-k="${n}" aria-pressed="${S.thr===n}">under ${n} h</button>`).join('');
+ $('incSeg').innerHTML=Object.entries(INC).map(([k,v])=>`<button data-a="inc" data-k="${k}" aria-pressed="${S.inc===k}">${v.label}</button>`).join('');
+ $('log').innerHTML=S.log.slice(-12).map(x=>`<div>› ${x}</div>`).join('');
+}
+document.addEventListener('input',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)S.val[v]=e.target.value});
+function fresh(keep){const d=S.dev,t=S.thr,i=S.inc,p=S.persona;init();S.dev=d;S.thr=t;S.inc=i;S.persona=keep||p}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+ if(a==='dev'){S.dev=b.dataset.k;render();return}
+ if(a==='persona'){fresh(b.dataset.k);render();return}
+ if(a==='thr'){S.thr=+b.dataset.k;lastLog='';render();return}
+ if(a==='inc'){S.inc=b.dataset.k;render();return}
+ if(a==='back'){back();return}
+ if(a==='start'){log('cancel.started');go('reason');return}
+ if(a==='reason'){S.reason=b.dataset.k;S.svcA=S.svcM=S.costS=S.persS=null;S.rating=0;S.autorenew=true;lastLog='';log('reason.selected '+S.reason+(S.reason==='inactive'?(low()?' low_use':' declining'):'')+(S.reason==='renewal'?(refundInfo().el?' within_7d':(refundInfo().inWin?' used_in_window':' after_7d')):''));go('page');return}
+ if(a==='open'){S.open=b.dataset.id;log('offer.opened '+S.open);render();return}
+ if(a==='chip'){S.chips[b.dataset.id]=b.dataset.c;render();return}
+ if(a==='rate'){S.rating=+b.dataset.n;lastLog='';log('service.rating='+S.rating+(S.val.svcText?' +text':''));render();return}
+ if(a==='q'){const k=b.dataset.key;S[k]=b.dataset.c;if(k==='svcA')S.svcM=null;S.open=null;lastLog='';log('subreason '+k+'='+b.dataset.c);render();return}
+ if(a==='renewtoggle'){S.autorenew=!S.autorenew;log('autorenew.'+(S.autorenew?'on':'off')+' (inline)');render();return}
+ if(a==='renewdone'){S.saved={ok:['Auto-renew is off','You keep full access until the end of your plan. No further charge.']};log('retained until_end reason=renewal');render();return}
+ if(a==='accept'){const s=sol(b.dataset.id);S.saved={ok:s.ok};log(`offer.accepted ${s.id}${s.cap?' cap='+s.cap+'%':''} reason=${S.reason} → retained`);if(s.id==='escalate')log(`escalation.logged rating=${S.rating}${S.val.svcText?' +text':''} → senior_review, internal_review=true`);if(s.id==='lighter'&&S.chips.lighter){const li=lightInfo(S.chips.lighter);if(li)log(`plan.downgraded to=${li.name} refund_diff=${Math.round(li.diff)} duration=unchanged`)}render();return}
+ if(a==='help'){log('support.opened');S.saved={ok:['Request sent','Our team will reach you on your registered email. Nothing is cancelled meanwhile.']};render();return}
+ if(a==='finish'){hist=[];S.saved=null;S.screen='plan';render();return}
+ if(a==='exit'){log('cancel.continued');go('exit');return}
+ if(a==='exitpick'){S.exit=b.dataset.v;render();return}
+ if(a==='exitback'){back();return}
+ if(a==='confirmExit'){const rf=refundInfo();log(`cancel.confirmed type=${S.exit==='stop'?'renewal_off':'end_now'}${S.exit==='now'&&rf.el?' refund='+Math.round(rf.back):''} reason=${S.reason||'skipped'}`);go('done');return}
+ if(a==='remind'){S.remind=b.dataset.c;log('winback.reminder '+S.remind+(S.val.future?' +note':''));render();return}
+ if(a==='comeback'){log('winback.return (demo)');go('back');return}
+ if(a==='restart'){fresh();render();return}
+});
+$('resetBtn').addEventListener('click',()=>{fresh();render()});
+init();
+
+</script>
+
+</html>

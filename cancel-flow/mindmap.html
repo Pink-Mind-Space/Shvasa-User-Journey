@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Cancel Flow Mind Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap">
+<style>
+:root{--bg:#EEEBE3;--surface:#fff;--surface2:#F4F1EA;--fg:#1B2220;--muted:#5E6A65;--ln:#BDB8AA;--ink:#fff;
+ --c0:#1F2A27;--c1:#0B7E6B;--c2:#C2263D;--c3:#B26A00;--c4:#5B3FD0;--c5:#2B6CB0;--c6:#7A5A3A;--c7:#4D5B56;
+ --tnew:#5B3FD0;--tnewbg:#ECE7FF;--tlive:#0A6B5B;--tlivebg:#DDF3EE;--tchk:#9A4A00;--tchkbg:#FFE9D6;--cap:#8A5E00;--capbg:#FFF1CC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1412;--surface:#18201E;--surface2:#212B28;--fg:#EAF0EC;--muted:#9CABA4;--ln:#3A4742;--ink:#0B100E;
+ --c0:#EAF0EC;--c1:#3DD1B3;--c2:#FF7A8A;--c3:#F0B654;--c4:#A894FF;--c5:#6CB2F2;--c6:#D1A97C;--c7:#9CABA4;
+ --tnew:#B9A8FF;--tnewbg:#2A2250;--tlive:#6EE0C4;--tlivebg:#12332B;--tchk:#FFB878;--tchkbg:#3A2412;--cap:#F0B654;--capbg:#3A2F14;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1412;--surface:#18201E;--surface2:#212B28;--fg:#EAF0EC;--muted:#9CABA4;--ln:#3A4742;--ink:#0B100E;
+ --c0:#EAF0EC;--c1:#3DD1B3;--c2:#FF7A8A;--c3:#F0B654;--c4:#A894FF;--c5:#6CB2F2;--c6:#D1A97C;--c7:#9CABA4;
+ --tnew:#B9A8FF;--tnewbg:#2A2250;--tlive:#6EE0C4;--tlivebg:#12332B;--tchk:#FFB878;--tchkbg:#3A2412;--cap:#F0B654;--capbg:#3A2F14;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.45;margin:0;
+ padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px}
+.top{max-width:1400px;margin:0 auto 14px;display:flex;flex-direction:column;gap:10px}
+h1{font-family:Poppins,Inter,sans-serif;font-size:24px;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:760px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar button{border:1px solid var(--ln);background:var(--surface);color:var(--fg);border-radius:8px;padding:6px 11px;font:inherit;font-size:12.5px;cursor:pointer}
+.bar button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.bar .sp{flex:1}
+.stats{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:12.5px}
+.stats b{color:var(--fg)}
+.tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+.tag.new{background:var(--tnewbg);color:var(--tnew)}.tag.live{background:var(--tlivebg);color:var(--tlive)}.tag.chk{background:var(--tchkbg);color:var(--tchk)}
+.cap{display:inline-block;font-size:9.5px;font-weight:700;border-radius:4px;padding:1px 6px;background:var(--capbg);color:var(--cap);margin-left:6px}
+.scroller{max-width:1400px;margin:0 auto;overflow-x:auto;background:var(--surface);border:1px solid var(--ln);border-radius:14px;padding:18px}
+.tree{display:inline-block;min-width:100%}
+.tn{display:flex;align-items:center}
+.kids{display:flex;flex-direction:column;margin-left:26px;position:relative}
+.kids::before{content:'';position:absolute;left:-26px;top:50%;width:26px;border-top:2px solid var(--ln)}
+.kids>.tn{position:relative;padding:4px 0 4px 26px}
+.kids>.tn::before{content:'';position:absolute;left:0;top:50%;width:26px;border-top:2px solid var(--ln)}
+.kids>.tn::after{content:'';position:absolute;left:0;top:0;bottom:0;border-left:2px solid var(--ln)}
+.kids>.tn:first-child::after{top:50%}.kids>.tn:last-child::after{bottom:50%}.kids>.tn:only-child::after{display:none}
+.kids>.tn:only-child::before{width:26px}
+.n{border-radius:10px;padding:8px 11px;max-width:270px;min-width:120px;font-size:13px;flex:none}
+.n.root{background:var(--c0);color:var(--bg);font-family:Poppins,Inter,sans-serif;font-weight:700;font-size:16px;padding:14px 16px}
+.n.reason{background:var(--c);color:var(--ink);font-weight:600;cursor:pointer;max-width:250px}
+.n.reason small{display:block;font-weight:400;opacity:.9;font-size:11.5px;margin-top:2px}
+.n.exit,.n.rule{background:var(--c);color:var(--ink);font-weight:600;cursor:pointer;max-width:250px}
+.n.sub{border:2px solid var(--c);background:var(--surface);font-weight:600;cursor:pointer}
+.n.sub small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:2px}
+.n.sol{background:var(--surface2);border:1px solid var(--ln);max-width:300px;transition:opacity .15s}
+.n.sol small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.n.note{border:1px dashed var(--ln);color:var(--muted);font-size:12px;max-width:300px;background:transparent}
+.n.dim{opacity:.18}
+.cnt{display:inline-block;font-size:10px;font-weight:700;background:rgba(255,255,255,.28);border-radius:8px;padding:0 6px;margin-left:5px}
+.n.sub .cnt{background:var(--surface2);color:var(--muted)}
+.collapsed>.kids{display:none}
+.legend{max-width:1400px;margin:14px auto 0;color:var(--muted);font-size:12.5px}
+</style>
+<div class="top">
+ <h1>Cancel flow mind map</h1>
+ <p class="sub">Every reason, sub-reason and solution in the prototype. Click a reason or sub-reason to fold it. Tags show what already exists and what would need building.</p>
+ <div class="stats" id="stats"></div>
+ <div class="bar" id="bar"></div>
+</div>
+<div class="scroller"><div class="tree" id="tree"></div></div>
+<p class="legend"><span class="tag live">LIVE</span> already on Shvasa &nbsp; <span class="tag new">NEW</span> would need building &nbsp; <span class="tag chk">TO CHECK</span> I could not confirm it exists &nbsp; <span class="cap">Cap 25%</span> discount or compensation cap (25% ceiling is yours; the split is my proposal). Refund rules are yours: 7 days, 10% third-party fee. Prototype: the cancel flow page.</p>
+<script>
+const DATA={"root":"Cancel flow","kids":[{"k":"reason","t":"1. Not using it enough","hero":"Hero: this month's practice","kids":[{"k":"sub","t":"Barely started: under 4 h in a month","cond":"Threshold is yours; 3, 4 or 5 h can be tried in the prototype","kids":[{"k":"note","t":"Shows: hours vs month goal, cost per hour practised, unused credits (Shvasa Daily), onboarding goal, hours to Rookie level"},{"k":"sol","t":"10-day restart: practise 3 times in 10 days, earn days back","tag":"new","cap":10,"note":"Reward is days added, never cash. % of monthly plan."},{"k":"sol","t":"Move to a lighter plan: price difference refunded, plan duration unchanged","tag":"live","cap":null,"note":"Offered when practice is under 4 h a month"},{"k":"sol","t":"Find a buddy","tag":"live","cap":null,"note":"Existing feature"},{"k":"sol","t":"Add time to unused credits (Shvasa Daily)","tag":"new","cap":null,"note":"Offered once per period"},{"k":"sol","t":"Pause (other plans)","tag":"live","cap":null,"note":"Replaces the credits option when the plan is not Shvasa Daily"}]},{"k":"sub","t":"Slowing down: 4 h or more, trending down","kids":[{"k":"note","t":"Shows: last 6 weeks by hour, busiest week vs last week, best streak is saved"},{"k":"sol","t":"10-day restart","tag":"new","cap":10},{"k":"sol","t":"Find a buddy","tag":"live"},{"k":"sol","t":"Pause (2 weeks, 1 month, or a date)","tag":"live","cap":null,"note":"Credits and end date freeze. Applies to every Family or Duo account on the plan."}]}]},{"k":"reason","t":"2. It renewed unexpectedly","hero":"Hero: the charge, days since, classes attended or booked since, auto-renew switch","kids":[{"k":"sub","t":"Within 7 days of renewal, nothing attended or booked","cond":"End access today = 90% back (10% third-party fee)","kids":[{"k":"note","t":"Shows: refund breakdown in the open: charged, 10% third-party fee, you get back. Only while no class has been attended or booked on the renewed plan."},{"k":"sol","t":"Move to a lighter plan: price difference refunded, plan duration unchanged","tag":"live","cap":null,"note":"Whether the 10% fee applies to the difference is to be confirmed."},{"k":"sol","t":"Gift your remaining time to someone","tag":"new"},{"k":"sol","t":"Switch billing (longer plans to monthly, monthly to 12 months)","tag":"live","cap":null,"note":"12 months is ₹3,333 a month against ₹4,999 on the monthly plan"},{"k":"sol","t":"Auto-renew switch on the page","tag":"live","cap":null,"note":"Switch off, keep access until end date"}]},{"k":"sub","t":"After 7 days, or already attended or booked on the renewed plan","cond":"Ending today: no refund","kids":[{"k":"note","t":"Shows: plainly that the refund policy no longer applies (window closed, or a class was attended or booked). A used plan is never refunded for unused time."},{"k":"sol","t":"Move to a lighter plan: price difference refunded, plan duration unchanged","tag":"live"},{"k":"sol","t":"Gift your remaining time to someone","tag":"new"},{"k":"sol","t":"Auto-renew switch on the page","tag":"live"}]}]},{"k":"reason","t":"3. The service was not up to the mark","hero":"Hero: 1 to 5 star rating and a free-text box. No category chips. Help shows once a rating is given.","kids":[{"k":"sub","t":"Private-plan members (detected from backend)","kids":[{"k":"sol","t":"Try a new dedicated teacher: 2 free 60-minute classes","tag":"new","cap":null,"note":"Shown first. Cap treatment to be decided."},{"k":"sol","t":"Token of appreciation + feedback reviewed by a senior team member. Logged internally (feeds coach performance analysis; not mentioned to the member).","tag":"new","cap":15,"note":"Credits or days worth up to 15% of the monthly plan, once per plan period"}]},{"k":"sub","t":"All other members (group plans: no teacher-change option, they can already choose any teacher)","kids":[{"k":"sol","t":"Token of appreciation + feedback reviewed by a senior team member. Logged internally (feeds coach performance analysis; not mentioned to the member).","tag":"new","cap":15,"note":"Credits or days worth up to 15% of the monthly plan, once per plan period"},{"k":"sol","t":"Complimentary 1:1 session","tag":"new","cap":15}]},{"k":"note","t":"Rating and text are logged internally with the case (feeds coach performance analysis; not mentioned to the member)."}]},{"k":"reason","t":"4. It costs more than I want to spend","hero":"Hero: what your plan has built (classes, hours, streak), what is still waiting, what is included","kids":[{"k":"note","t":"No sub-reasons. Solutions show straight away. The discount line appears only for members with no practice in the last 30+ days."},{"k":"sol","t":"Move to a lighter plan: price difference refunded, plan duration unchanged","tag":"live"},{"k":"sol","t":"Stay Lite: keep account, progress and community, no live classes","tag":"new"},{"k":"sol","t":"One-time offer on next renewal: exact % set by system rules, up to 25%. Only for members with no practice in the last 30 days or more.","tag":"live","cap":25}]},{"k":"reason","t":"5. Personal reasons","hero":"Hero: \"Held for you\": streak, level, journal, community","kids":[{"k":"sub","t":"Travelling","kids":[{"k":"sol","t":"Complimentary 1:1 class at your destination hour","tag":"new","cap":15},{"k":"sol","t":"Pause (2 weeks, 1 month, or a date)","tag":"live","cap":null,"note":"Credits and end date freeze. Applies to every Family or Duo account on the plan."},{"k":"sol","t":"Stay Lite","tag":"new"}]},{"k":"sub","t":"Family or health","kids":[{"k":"sol","t":"Pause (2 weeks, 1 month, or a date)","tag":"live","cap":null,"note":"Credits and end date freeze. Applies to every Family or Duo account on the plan."},{"k":"sol","t":"Gift remaining time to someone","tag":"new"},{"k":"sol","t":"Stay Lite","tag":"new"}]},{"k":"sub","t":"Busy period","kids":[{"k":"sol","t":"Pause (2 weeks, 1 month, or a date)","tag":"live","cap":null,"note":"Credits and end date freeze. Applies to every Family or Duo account on the plan."},{"k":"sol","t":"Lighter plan","tag":"live"},{"k":"sol","t":"10-day restart","tag":"new","cap":10}]}]},{"k":"reason","t":"6. Something else","hero":"Hero: free text, logged","kids":[{"k":"sub","t":"Free text","kids":[{"k":"sol","t":"Pause (2 weeks, 1 month, or a date)","tag":"live","cap":null,"note":"Credits and end date freeze. Applies to every Family or Duo account on the plan."},{"k":"sol","t":"Stay Lite","tag":"new"},{"k":"sol","t":"Talk to support","tag":"live"}]}]},{"k":"exit","t":"If they still cancel","hero":"Two honest endings, then a way back","kids":[{"k":"sub","t":"How to end","kids":[{"k":"sol","t":"Stop auto-renew, keep access to the end date (default)","tag":"live"},{"k":"sol","t":"End access today","tag":"live","cap":null,"note":"Within 7 days and nothing attended or booked: refund of 90%. Otherwise no refund."}]},{"k":"sub","t":"The way back","kids":[{"k":"sol","t":"Your Shvasa chapter: recap card of classes, hours, best streak","tag":"new"},{"k":"sol","t":"Comeback offer: bonus credits or welcome-back offer","tag":"new","cap":20,"note":"Held for returning; applies to the first plan"},{"k":"sol","t":"Note to future you, sent on a day they choose","tag":"new"},{"k":"sol","t":"Reminders at 2 weeks, 1 month or 3 months, only if chosen","tag":"new"},{"k":"sol","t":"One-tap return with progress restored","tag":"new"}]}]},{"k":"rule","t":"Rules that apply everywhere","kids":[{"k":"note","t":"Discount ceiling: 25%. Total never above 25% in one plan period. Refunds are not discounts."},{"k":"note","t":"Refund policy: within 7 days of renewal, 10% third-party fee. Does not apply once a class is attended or booked on the renewed plan."},{"k":"note","t":"Downgrade to a lighter plan (retention only): the price difference is refunded and the plan duration stays the same. Unused time is never refunded."},{"k":"note","t":"Inactive members are not given class recommendations as the main fix."},{"k":"note","t":"\"Continue to cancel\" and \"Talk to support\" are always visible. Everything is self-serve."},{"k":"note","t":"Every step is logged: reason, sub-reason, offers shown, offer accepted, how they ended."}]}]};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const TAG={live:'LIVE',new:'NEW',chk:'TO CHECK'};
+function count(n){let c=0;(n.kids||[]).forEach(k=>{if(k.k==='sol')c++;c+=count(k)});return c}
+function node(n,ci){
+ const kids=n.kids||[];
+ let inner='';
+ if(n.k==='sol')inner=`<div class="n sol" data-tag="${n.tag}" data-cap="${n.cap?1:0}"><span class="tag ${n.tag}">${TAG[n.tag]}</span>${esc(n.t)}${n.cap?`<span class="cap">Cap ${n.cap}%</span>`:''}${n.note?`<small>${esc(n.note)}</small>`:''}</div>`;
+ else if(n.k==='note')inner=`<div class="n note">${esc(n.t)}</div>`;
+ else {const c=count(n);inner=`<div class="n ${n.k}" data-fold="1">${esc(n.t)}${c?`<span class="cnt">${c}</span>`:''}${n.hero?`<small>${esc(n.hero)}</small>`:''}${n.cond?`<small>${esc(n.cond)}</small>`:''}</div>`}
+ return `<div class="tn" style="--c:var(--c${ci})">${inner}${kids.length?`<div class="kids">${kids.map(k=>node(k,ci)).join('')}</div>`:''}</div>`}
+const root=`<div class="tn"><div class="n root">${esc(DATA.root)}</div><div class="kids">${DATA.kids.map((k,i)=>node(k,i+1)).join('')}</div></div>`;
+document.getElementById('tree').innerHTML=root;
+let reasons=DATA.kids.filter(k=>k.k==='reason').length,subs=0,sols=0,nw=0,lv=0,ck=0,cp=0;
+(function w(n){(n.kids||[]).forEach(k=>{if(k.k==='sub')subs++;if(k.k==='sol'){sols++;if(k.tag==='new')nw++;if(k.tag==='live')lv++;if(k.tag==='chk')ck++;if(k.cap)cp++}w(k)})})(DATA);
+document.getElementById('stats').innerHTML=`<span><b>${reasons}</b> reasons</span><span><b>${subs}</b> sub-reasons</span><span><b>${sols}</b> solution slots</span><span><b>${nw}</b> new</span><span><b>${lv}</b> live</span><span><b>${ck}</b> to check</span><span><b>${cp}</b> with a cap</span>`;
+let filt='all';
+function apply(){document.querySelectorAll('.n.sol').forEach(e=>{const t=e.dataset.tag,cap=e.dataset.cap==='1';const ok=filt==='all'||filt===t||(filt==='cap'&&cap);e.classList.toggle('dim',!ok)})}
+const F=[['all','All'],['new','Only NEW'],['live','Only LIVE'],['chk','Only TO CHECK'],['cap','With a cap']];
+function bar(){document.getElementById('bar').innerHTML=F.map(f=>`<button data-f="${f[0]}" aria-pressed="${filt===f[0]}">${f[1]}</button>`).join('')+'<span class="sp"></span><button data-x="collapse">Fold all</button><button data-x="expand">Unfold all</button>'}
+bar();
+document.addEventListener('click',e=>{
+ const f=e.target.closest('[data-f]');if(f){filt=f.dataset.f;bar();apply();return}
+ const x=e.target.closest('[data-x]');if(x){document.querySelectorAll('.tn').forEach(t=>{if(t.querySelector(':scope>.kids')&&t.querySelector(':scope>.n[data-fold]'))t.classList.toggle('collapsed',x.dataset.x==='collapse')});return}
+ const n=e.target.closest('[data-fold]');if(n){n.parentElement.classList.toggle('collapsed')}
+});
+</script>
+</html>

@@ -1,0 +1,77 @@
+# Shvasa cancel flow: reasons, sub-reasons and solutions
+
+Tags: LIVE = already on Shvasa, NEW = would need building, TO CHECK = not confirmed to exist. Cap = discount or compensation cap (25% ceiling is set by Pinks; the split is a proposal). Refund rules: within 7 days of renewal, 10% third-party fee. Prototype pricing from app.shvasa.com/pricing, read 22 Oct 2026.
+
+- **1. Not using it enough** (Hero: this month's practice)
+  - **Barely started: under 4 h in a month** [Threshold is yours; 3, 4 or 5 h can be tried in the prototype]
+    - _Shows: hours vs month goal, cost per hour practised, unused credits (Shvasa Daily), onboarding goal, hours to Rookie level_
+    - [NEW] 10-day restart: practise 3 times in 10 days, earn days back (cap 10%): Reward is days added, never cash. % of monthly plan.
+    - [LIVE] Move to a lighter plan: price difference refunded, plan duration unchanged: Offered when practice is under 4 h a month
+    - [LIVE] Find a buddy: Existing feature
+    - [NEW] Add time to unused credits (Shvasa Daily): Offered once per period
+    - [LIVE] Pause (other plans): Replaces the credits option when the plan is not Shvasa Daily
+  - **Slowing down: 4 h or more, trending down**
+    - _Shows: last 6 weeks by hour, busiest week vs last week, best streak is saved_
+    - [NEW] 10-day restart (cap 10%)
+    - [LIVE] Find a buddy
+    - [LIVE] Pause (2 weeks, 1 month, or a date): Credits and end date freeze. Applies to every Family or Duo account on the plan.
+- **2. It renewed unexpectedly** (Hero: the charge, days since, classes attended or booked since, auto-renew switch)
+  - **Within 7 days of renewal, nothing attended or booked** [End access today = 90% back (10% third-party fee)]
+    - _Shows: refund breakdown in the open: charged, 10% third-party fee, you get back. Only while no class has been attended or booked on the renewed plan._
+    - [LIVE] Move to a lighter plan: price difference refunded, plan duration unchanged: Whether the 10% fee applies to the difference is to be confirmed.
+    - [NEW] Gift your remaining time to someone
+    - [LIVE] Switch billing (longer plans to monthly, monthly to 12 months): 12 months is ₹3,333 a month against ₹4,999 on the monthly plan
+    - [LIVE] Auto-renew switch on the page: Switch off, keep access until end date
+  - **After 7 days, or already attended or booked on the renewed plan** [Ending today: no refund]
+    - _Shows: plainly that the refund policy no longer applies (window closed, or a class was attended or booked). A used plan is never refunded for unused time._
+    - [LIVE] Move to a lighter plan: price difference refunded, plan duration unchanged
+    - [NEW] Gift your remaining time to someone
+    - [LIVE] Auto-renew switch on the page
+- **3. The service was not up to the mark** (Hero: 1 to 5 star rating and a free-text box. No category chips. Help shows once a rating is given.)
+  - **Private-plan members (detected from backend)**
+    - [NEW] Try a new dedicated teacher: 2 free 60-minute classes: Shown first. Cap treatment to be decided.
+    - [NEW] Token of appreciation + feedback reviewed by a senior team member. Logged internally (feeds coach performance analysis; not mentioned to the member). (cap 15%): Credits or days worth up to 15% of the monthly plan, once per plan period
+  - **All other members (group plans: no teacher-change option, they can already choose any teacher)**
+    - [NEW] Token of appreciation + feedback reviewed by a senior team member. Logged internally (feeds coach performance analysis; not mentioned to the member). (cap 15%): Credits or days worth up to 15% of the monthly plan, once per plan period
+    - [NEW] Complimentary 1:1 session (cap 15%)
+  - _Rating and text are logged internally with the case (feeds coach performance analysis; not mentioned to the member)._
+- **4. It costs more than I want to spend** (Hero: what your plan has built (classes, hours, streak), what is still waiting, what is included)
+  - _No sub-reasons. Solutions show straight away. The discount line appears only for members with no practice in the last 30+ days._
+  - [LIVE] Move to a lighter plan: price difference refunded, plan duration unchanged
+  - [NEW] Stay Lite: keep account, progress and community, no live classes
+  - [LIVE] One-time offer on next renewal: exact % set by system rules, up to 25%. Only for members with no practice in the last 30 days or more. (cap 25%)
+- **5. Personal reasons** (Hero: "Held for you": streak, level, journal, community)
+  - **Travelling**
+    - [NEW] Complimentary 1:1 class at your destination hour (cap 15%)
+    - [LIVE] Pause (2 weeks, 1 month, or a date): Credits and end date freeze. Applies to every Family or Duo account on the plan.
+    - [NEW] Stay Lite
+  - **Family or health**
+    - [LIVE] Pause (2 weeks, 1 month, or a date): Credits and end date freeze. Applies to every Family or Duo account on the plan.
+    - [NEW] Gift remaining time to someone
+    - [NEW] Stay Lite
+  - **Busy period**
+    - [LIVE] Pause (2 weeks, 1 month, or a date): Credits and end date freeze. Applies to every Family or Duo account on the plan.
+    - [LIVE] Lighter plan
+    - [NEW] 10-day restart (cap 10%)
+- **6. Something else** (Hero: free text, logged)
+  - **Free text**
+    - [LIVE] Pause (2 weeks, 1 month, or a date): Credits and end date freeze. Applies to every Family or Duo account on the plan.
+    - [NEW] Stay Lite
+    - [LIVE] Talk to support
+- **If they still cancel** (Two honest endings, then a way back)
+  - **How to end**
+    - [LIVE] Stop auto-renew, keep access to the end date (default)
+    - [LIVE] End access today: Within 7 days and nothing attended or booked: refund of 90%. Otherwise no refund.
+  - **The way back**
+    - [NEW] Your Shvasa chapter: recap card of classes, hours, best streak
+    - [NEW] Comeback offer: bonus credits or welcome-back offer (cap 20%): Held for returning; applies to the first plan
+    - [NEW] Note to future you, sent on a day they choose
+    - [NEW] Reminders at 2 weeks, 1 month or 3 months, only if chosen
+    - [NEW] One-tap return with progress restored
+- **Rules that apply everywhere**
+  - _Discount ceiling: 25%. Total never above 25% in one plan period. Refunds are not discounts._
+  - _Refund policy: within 7 days of renewal, 10% third-party fee. Does not apply once a class is attended or booked on the renewed plan._
+  - _Downgrade to a lighter plan (retention only): the price difference is refunded and the plan duration stays the same. Unused time is never refunded._
+  - _Inactive members are not given class recommendations as the main fix._
+  - _"Continue to cancel" and "Talk to support" are always visible. Everything is self-serve._
+  - _Every step is logged: reason, sub-reason, offers shown, offer accepted, how they ended._
